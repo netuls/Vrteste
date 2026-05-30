@@ -772,11 +772,13 @@ function sendClientConfirmation() {
     '*Valor:* R$' + Number(sel.price).toFixed(2).replace('.', ','), '',
     'Qualquer dúvida, é só responder esta mensagem. Te esperamos! ✂️',
   ];
-  const clientPhone = state.phone.replace(/\D/g, '');
+  const clientPhone = state.phone.replace(/\D/g, '').replace(/^55/, '');
   window.open(`https://wa.me/55${clientPhone}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
 }
 
 window.submitBooking = async function() {
+  if (window._submitting) return;
+  window._submitting = true;
   const btn = document.querySelector('.btn-confirm');
   btn.textContent = 'Enviando...'; btn.disabled = true;
   try {
@@ -790,10 +792,11 @@ window.submitBooking = async function() {
       criadoEm: firebase.firestore.FieldValue.serverTimestamp()
     });
     sendWhatsAppNotification();
+    sendClientConfirmation();
     document.getElementById('success-modal').classList.add('open');
     state = { selected: null, name: '', phone: '', date: '', time: '', obs: '' };
     window.state = state;
-    calAno = undefined; calMes = undefined;
+    const _now = new Date(); calAno = _now.getFullYear(); calMes = _now.getMonth();
     ['client-name','client-phone','pref-date','obs'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
@@ -809,6 +812,7 @@ window.submitBooking = async function() {
     alert('Erro ao enviar. Verifique a conexão e tente novamente.');
   } finally {
     btn.textContent = '✓ Confirmar'; btn.disabled = false;
+    window._submitting = false;
   }
 };
 
