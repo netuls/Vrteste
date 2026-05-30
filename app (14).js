@@ -251,7 +251,7 @@ window.openMyBookings = async function() {
     }
 
     // Filtra futuros e ordena por data+horario no JS (evita índice composto no Firestore)
-    const hoje = new Date().toISOString().split('T')[0];
+    const _h = new Date(); const hoje = `${_h.getFullYear()}-${String(_h.getMonth()+1).padStart(2,'0')}-${String(_h.getDate()).padStart(2,'0')}`;
     const docs = snap.docs
       .filter(d => d.data().data >= hoje)
       .sort((a, b) => {
@@ -541,7 +541,7 @@ async function carregarSlotsParaData(dataSelecionada) {
     }
     const slots = gerarSlots(cfg.inicio, cfg.fim, cfg.almoco, cfg.almoco_inicio, cfg.almoco_fim);
     const agora = new Date();
-    const hoje  = agora.toISOString().split('T')[0];
+    const hoje  = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
     const agoraMin = agora.getHours() * 60 + agora.getMinutes();
     // Verifica se o serviço selecionado dura 1h
     const servicoAtual = state && state.selected ? state.selected : null;
